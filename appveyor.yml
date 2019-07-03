@@ -30,9 +30,9 @@ build_script:
     C:\Qt\Tools\QtCreator\bin\jom.exe -f Makefile
 
 artifacts:
-  - path: .\*.zip
-    name: Mapleseed
+  - path: C:\projects\mapleseed\mapleseed.zip
+    name: mapleseed
     
 after_build:
-  - ps: 7z a mapleseed_canary_1.1.0-{build}.zip C:\projects\mapleseed\CemuCrypto\release\*.dll C:\projects\mapleseed\CemuDatabase\release\*.dll C:\projects\mapleseed\CemuLibrary\release\*.dll C:\projects\mapleseed\Network\release\*.dll C:\projects\mapleseed\Core\release\*.exe
+  - ps: 7z a C:\projects\mapleseed\mapleseed.zip C:\projects\mapleseed\CemuCrypto\release\*.dll C:\projects\mapleseed\CemuDatabase\release\*.dll C:\projects\mapleseed\CemuLibrary\release\*.dll C:\projects\mapleseed\Network\release\*.dll C:\projects\mapleseed\Core\release\*.exe
   
