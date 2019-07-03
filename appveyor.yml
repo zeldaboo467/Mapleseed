@@ -30,13 +30,5 @@ build_script:
     C:\Qt\Tools\QtCreator\bin\jom.exe -f Makefile
 
 artifacts:
-  - path: build\CemuCrypto\release\CemuCrypto.dll
-    name: bin
-  - path: build\CemuDB\release\CemuDatabase.dll
-    name: bin
-  - path: build\CemuLibrary\release\CemuLibrary.dll
-    name: bin
-  - path: build\Network\release\Network.dll
-    name: bin
-  - path: build\Core\release\MapleSeed.exe
+  - path: build\*
     name: bin
