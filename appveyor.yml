@@ -34,5 +34,5 @@ artifacts:
     name: Mapleseed
     
 after_build:
-  - ps: 7z a mapleseed_canary_1.1.0-{build}.zip %APPVEYOR_BUILD_FOLDER%\CemuCrypto\release\*.dll %APPVEYOR_BUILD_FOLDER%\CemuDatabase\release\*.dll %APPVEYOR_BUILD_FOLDER%\CemuLibrary\release\*.dll %APPVEYOR_BUILD_FOLDER%\Network\release\*.dll %APPVEYOR_BUILD_FOLDER%\Core\release\*.exe
+  - ps: 7z a mapleseed_canary_1.1.0-{build}.zip {APPVEYOR_BUILD_FOLDER}\CemuCrypto\release\*.dll {APPVEYOR_BUILD_FOLDER}\CemuDatabase\release\*.dll {APPVEYOR_BUILD_FOLDER}\CemuLibrary\release\*.dll {APPVEYOR_BUILD_FOLDER}\Network\release\*.dll {APPVEYOR_BUILD_FOLDER}\Core\release\*.exe
   
