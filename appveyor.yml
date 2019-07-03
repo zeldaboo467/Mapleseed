@@ -1,0 +1,44 @@
+image: Visual Studio 2017
+configuration: Release
+platform: x64
+
+branches:
+  only:
+  - master
+
+environment:
+  matrix:
+  - platform: amd64
+    qt: msvc2017_64
+
+init:
+- cmd: >-
+    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %platform%
+
+install:
+- cmd: >-
+    SET QTDIR=C:\Qt\5.12\msvc2017_64
+    
+    SET OPENSSL=C:\OpenSSL-v111-Win64
+    
+    SET PATH=%OPENSSL%\bin;%QTDIR%\bin;%PATH%;
+
+build_script:
+- cmd: >-
+    call scripts\version.cmd
+    
+    qmake mapleseed.pro -spec win32-msvc
+    
+    C:\Qt\Tools\QtCreator\bin\jom.exe -f Makefile.Release
+
+artifacts:
+  - path: build\CemuCrypto\release\CemuCrypto.dll
+    name: bin
+  - path: build\CemuDB\release\CemuDatabase.dll
+    name: bin
+  - path: build\CemuLibrary\release\CemuLibrary.dll
+    name: bin
+  - path: build\Network\release\Network.dll
+    name: bin
+  - path: build\Core\release\MapleSeed.exe
+    name: bin
