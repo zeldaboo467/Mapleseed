@@ -1,7 +1,7 @@
 # Mapleseed
 A content management tool for Wii U emulator Cemu
 
-[![Build status](https://ci.appveyor.com/api/projects/status/rdcc6m9tafnsqb1n/branch/master?svg=true)](https://ci.appveyor.com/project/Tsume/maple-tree/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/g61duaraswsynw7u/branch/master?svg=true)](https://ci.appveyor.com/project/Tsume/mapleseed/branch/master)
 
 #### Requirements
 - Windows 7 and above
