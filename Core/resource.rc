@@ -1,6 +1,6 @@
 //generated resource header 
 #include <windows.h> 
-IDI_ICON1 ICON "sprout.ico" 
+IDI_ICON1 ICON "../resources/icon.ico" 
 VS_VERSION_INFO VERSIONINFO 
 FILEVERSION 1, 1, 0, 0 
 PRODUCTVERSION 1, 1, 0, 0 
