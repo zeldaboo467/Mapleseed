@@ -30,5 +30,5 @@ build_script:
     C:\Qt\Tools\QtCreator\bin\jom.exe -f Makefile
 
 artifacts:
-  - path: build\*
+  - path: *
     name: bin
