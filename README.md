@@ -8,7 +8,8 @@ A content management tool for Wii U emulator Cemu
 - Active internet connection
 
 #### Download Releases
-- https://www.reddit.com/r/MapleSeed/
+- Latest Stable: [Download Here](https://www.reddit.com/r/MapleSeed/comments/bs1i2v/mapleseed_release_downloads/)
+- Latest Canary: [Download Here](https://ci.appveyor.com/api/projects/Tsume/Mapleseed/artifacts/mapleseed.zip?branch=master)
 
 # 
 ### Donations
