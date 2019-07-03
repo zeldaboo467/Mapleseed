@@ -1,8 +1,14 @@
 TEMPLATE = subdirs
 
-SUBDIRS += Core CemuDB CemuLibrary Network CemuCrypto
+SUBDIRS += CemuDB CemuLibrary CemuCrypto Network Core
 
-Core.depends = CemuDB
-Core.depends = CemuLibrary
-Core.depends = Network
-Core.depends = CemuCrypto
+Core.depends = CemuDB CemuLibrary CemuCrypto Network
+
+# where to find the sub projects - give the folders
+CemuDB.subdir  = ./CemuDB
+CemuLibrary.subdir  = ./CemuLibrary
+CemuCrypto.subdir  = ./CemuCrypto
+Network.subdir  = ./Network
+Core.subdir = ./Core
+
+CONFIG += ordered

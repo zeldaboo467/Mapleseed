@@ -27,7 +27,7 @@ build_script:
 - cmd: >-
     qmake mapleseed.pro -spec win32-msvc
     
-    C:\Qt\Tools\QtCreator\bin\jom.exe -f Makefile.Release
+    C:\Qt\Tools\QtCreator\bin\jom.exe -f Makefile
 
 artifacts:
   - path: build\CemuCrypto\release\CemuCrypto.dll
