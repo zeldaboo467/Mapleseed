@@ -30,7 +30,7 @@ build_script:
     C:\Qt\Tools\QtCreator\bin\jom.exe -f Makefile
 
 artifacts:
-  - path: *.zip
+  - path: .\*.zip
     name: Mapleseed
     
 after_build:
