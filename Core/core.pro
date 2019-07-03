@@ -50,12 +50,12 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 INCLUDEPATH += C:/OpenSSL-v111-Win64/include
 DEPENDPATH += C:/OpenSSL-v111-Win64/include
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../CemuDB/release/ -lCemuDatabase
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../CemuDB/debug/ -lCemuDatabase
-else:unix: LIBS += -L$$OUT_PWD/../CemuDB/ -lCemuDatabase
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../CemuDatabase/release/ -lCemuDatabase
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../CemuDatabase/debug/ -lCemuDatabase
+else:unix: LIBS += -L$$OUT_PWD/../CemuDatabase/ -lCemuDatabase
 
-INCLUDEPATH += $$PWD/../CemuDB
-DEPENDPATH += $$PWD/../CemuDB
+INCLUDEPATH += $$PWD/../CemuDatabase
+DEPENDPATH += $$PWD/../CemuDatabase
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../CemuLibrary/release/ -lCemuLibrary
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../CemuLibrary/debug/ -lCemuLibrary
