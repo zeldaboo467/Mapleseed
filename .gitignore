@@ -1,0 +1,48 @@
+﻿# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.ilk
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Qt Generated files
+moc_*.cbt
+moc_*.cpp
+moc_*.h
+
+# Custom files
+*.user
+*.aps
+/.vs
+Makefile
+versioninfo.h
+build
+bin
+mapleseed.rc
