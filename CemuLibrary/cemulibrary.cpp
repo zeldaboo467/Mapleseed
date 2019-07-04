@@ -2,8 +2,7 @@
 
 CemuLibrary *CemuLibrary::instance;
 
-CemuLibrary::CemuLibrary()
-{}
+CemuLibrary::CemuLibrary() = default;
 
 CemuLibrary *CemuLibrary::initialize()
 {

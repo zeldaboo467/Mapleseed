@@ -3,8 +3,7 @@
 
 CemuDatabase *CemuDatabase::instance;
 
-CemuDatabase::CemuDatabase()
-{}
+CemuDatabase::CemuDatabase() = default;
 
 CemuDatabase* CemuDatabase::initialize()
 {

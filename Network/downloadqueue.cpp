@@ -2,9 +2,7 @@
 
 DownloadQueue *DownloadQueue::instance;
 
-DownloadQueue::DownloadQueue()
-{
-}
+DownloadQueue::DownloadQueue() = default;
 
 DownloadQueue *DownloadQueue::initialize()
 {
