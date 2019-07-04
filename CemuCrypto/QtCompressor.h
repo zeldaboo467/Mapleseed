@@ -11,23 +11,24 @@ public:
     //A recursive function that scans all files inside the source folder
     //and serializes all files in a row of file names and compressed
     //binary data in a single file
-    bool compress(QString sourceFolder, QString destinationFile);
+    bool compress(const QString& sourceFolder, const QString& destinationFile);
+
+    //handles compression of indiviual directories, iterating through levels
+    bool handleCompress(const QString& sourceFolder, const QString& prefex);
 
     //A function that deserializes data from the compressed file and
     //creates any needed subfolders before saving the file
-    bool decompress(QString sourceFile, QString destinationFolder);
+    bool decompress(const QString& sourceFile, const QString& destinationFolder);
 
 	//counts the number of files in a directory
-    int count(QString directory);
+    int count(const QString& directory);
 
 private:
     QFile file;
     QDataStream dataStream;
-    int curFile;
-    int numFiles;
-    int countDown;
-
-    bool handleCompress(QString sourceFolder, QString prefex);
+    int curFile{};
+    int numFiles{};
+    int countDown{};
 	
 signals:
     void Progress(qint64 min, qint64 max);

@@ -1,18 +1,20 @@
+#include <utility>
+
+#include <utility>
+
 #include "cemucrypto.h"
 
-CemuCrypto::CemuCrypto()
-{
-}
+CemuCrypto::CemuCrypto() = default;
 
 CemuCrypto::CemuCrypto(QString titleKey, QString basedir)
 {
-    TitleKey = titleKey;
-    Directory = basedir;
+    TitleKey = std::move(titleKey);
+    Directory = std::move(basedir);
 }
 
 CemuCrypto *CemuCrypto::initialize(QString titleKey, QString basedir)
 {
-    return new CemuCrypto(titleKey, basedir);
+    return new CemuCrypto(std::move(titleKey), std::move(basedir));
 }
 
 void CemuCrypto::Start()
@@ -26,7 +28,8 @@ quint16 CemuCrypto::bs16(quint16 s)
     return static_cast<quint16>( ((s)>>8) | ((s)<<8) );
 }
 
-quint32 CemuCrypto::bs24(quint32 i) {
+quint32 CemuCrypto::bs24(quint32 i)
+{
     return ((i & 0xFF0000) >> 16) | ((i & 0xFF) << 16) | (i & 0x00FF00);
 }
 
@@ -35,11 +38,13 @@ quint32 CemuCrypto::bs32(quint32 s)
     return static_cast<quint32>( (((s)&0xFF0000)>>8) | (((s)&0xFF00)<<8) | ((s)>>24) | ((s)<<24) );
 }
 
-qulonglong CemuCrypto::bs64(qulonglong i) {
+qulonglong CemuCrypto::bs64(qulonglong i)
+{
     return static_cast<qulonglong>(((static_cast<qulonglong>(bs32(i & 0xFFFFFFFF))) << 32) | (bs32(i >> 32)));
 }
 
-char* CemuCrypto::ReadFile(QString file, quint32 *len) {
+char* CemuCrypto::ReadFile(const QString& file, quint32 *len)
+{
     QFile in(file);
     if (!in.open(QIODevice::ReadOnly)) {
         return nullptr;
@@ -49,27 +54,28 @@ char* CemuCrypto::ReadFile(QString file, quint32 *len) {
     QByteArray bytearray(in.readAll());
     in.close();
 
-    size_t size = static_cast<size_t>(bytearray.size());
+    auto size = static_cast<size_t>(bytearray.size());
     char* data = new char[size];
     memcpy(data, bytearray.data(), size);
     return data;
 }
 
 #define BLOCK_SIZE  0x10000
-void CemuCrypto::ExtractFileHash(QFile * in, qulonglong PartDataOffset, qulonglong FileOffset, qulonglong Size, QString FileName, quint16 ContentID, int i1, int i2) {
-    char encdata[BLOCK_SIZE];
+void CemuCrypto::ExtractFileHash(QFile * in, qulonglong PartDataOffset, qulonglong FileOffset, qulonglong Size, const QString& FileName, quint16 ContentID, int i1, int i2)
+{
     char decdata[BLOCK_SIZE];
-    quint8 IV[16];
-    quint8 hash[SHA_DIGEST_LENGTH];
-    quint8 H0[SHA_DIGEST_LENGTH];
-    quint8 Hashes[0x400];
+    unsigned char IV[16];
+    unsigned char hash[SHA_DIGEST_LENGTH];
+    unsigned char H0[SHA_DIGEST_LENGTH];
+    unsigned char Hashes[0x400];
 
     qulonglong Wrote = 0;
-    qulonglong WriteSize = 0xFC00;  // Hash block size
+    qulonglong WriteSize = 0xFC00; //Hash block size
     qulonglong Block = (FileOffset / 0xFC00) & 0xF;
 
-    QFile* out = new QFile(FileName);
-    if (!out->open(QIODevice::WriteOnly)) {
+    auto* out = new QFile(FileName);
+    if (!out->open(QIODevice::WriteOnly))
+    {
         qCritical() << out->errorString();
         exit(0);
     }
@@ -81,28 +87,39 @@ void CemuCrypto::ExtractFileHash(QFile * in, qulonglong PartDataOffset, qulonglo
         WriteSize = WriteSize - soffset;
 
     in->seek(static_cast<qlonglong>(PartDataOffset + roffset));
-    while (Size > 0) {
+    while (Size > 0)
+    {
         if (WriteSize > Size)
             WriteSize = Size;
 
-        in->read(encdata, BLOCK_SIZE);
+        auto* temp_encdata = new char[BLOCK_SIZE]();
+        auto len = in->read(temp_encdata, BLOCK_SIZE);
 
-        memset(IV, 0, sizeof(IV));
-        IV[1] = static_cast<quint8>(ContentID);
-        AES_cbc_encrypt(reinterpret_cast<const quint8*>(encdata), static_cast<quint8*>(Hashes), 0x400, &_key, IV, AES_DECRYPT);
+        auto* encdata = new quint8[len]();
+        memcpy(encdata, temp_encdata, len);
 
-        memcpy(H0, Hashes + 0x14 * Block, SHA_DIGEST_LENGTH);
+        memset((void*) IV, 0, sizeof(IV));
+        IV[1] = static_cast<unsigned char>(ContentID);
 
-        memcpy(IV, Hashes + 0x14 * Block, sizeof(IV));
+        AES_cbc_encrypt(encdata, static_cast<quint8*>(Hashes), 0x400, &_key, (unsigned char*) IV, AES_DECRYPT);
+
+        memcpy((void*) H0, Hashes + 0x14 * Block, SHA_DIGEST_LENGTH);
+
+        memcpy((void*) IV, Hashes + 0x14 * Block, sizeof(IV));
+
         if (Block == 0)
             IV[1] ^= ContentID;
-        AES_cbc_encrypt(reinterpret_cast<const quint8*>(encdata + 0x400), reinterpret_cast<quint8*>(decdata), 0xFC00, &_key, IV, AES_DECRYPT);
+
+        AES_cbc_encrypt(reinterpret_cast<const quint8*>(encdata + 0x400), reinterpret_cast<quint8*>(decdata), 0xFC00, &_key, (unsigned char*) IV, AES_DECRYPT);
 
         SHA1(reinterpret_cast<const quint8*>(decdata), 0xFC00, hash);
+
         if (Block == 0)
             hash[1] ^= ContentID;
         H0Count++;
-        if (memcmp(hash, H0, SHA_DIGEST_LENGTH) != 0) {
+
+        if (memcmp(hash, H0, SHA_DIGEST_LENGTH) != 0)
+        {
             H0Fail++;
             qCritical() << "failed to verify H0 hash:" << out->fileName();
             return;
@@ -116,7 +133,8 @@ void CemuCrypto::ExtractFileHash(QFile * in, qulonglong PartDataOffset, qulonglo
         if (Block >= 16)
             Block = 0;
 
-        if (soffset) {
+        if (soffset)
+        {
             WriteSize = 0xFC00;
             soffset = 0;
         }
@@ -129,7 +147,8 @@ void CemuCrypto::ExtractFileHash(QFile * in, qulonglong PartDataOffset, qulonglo
 #undef BLOCK_SIZE
 
 #define BLOCK_SIZE  0x8000
-void CemuCrypto::ExtractFile(QFile * in, qulonglong PartDataOffset, qulonglong FileOffset, qulonglong Size, QString FileName, quint16 ContentID, int i1, int i2) {
+void CemuCrypto::ExtractFile(QFile * in, qulonglong PartDataOffset, qulonglong FileOffset, qulonglong Size, const QString& FileName, quint16 ContentID, int i1, int i2)
+{
     char encdata[BLOCK_SIZE];
     char decdata[BLOCK_SIZE];
     qulonglong Wrote = 0;
@@ -139,7 +158,7 @@ void CemuCrypto::ExtractFile(QFile * in, qulonglong PartDataOffset, qulonglong F
     qulonglong soffset = FileOffset - (FileOffset / BLOCK_SIZE * BLOCK_SIZE);
     //printf("Extracting:\"%s\" RealOffset:%08llX RealOffset:%08llX\n", FileName, roffset, soffset );
 
-    QFile* out = new QFile(FileName);
+    auto* out = new QFile(FileName);
     if (!out->open(QIODevice::WriteOnly)) {
         qCritical() << out->errorString();
         exit(0);
@@ -201,7 +220,7 @@ qint32 CemuCrypto::Decrypt()
     return Decrypt(TMD, nullptr, Directory);
 }
 
-qint32 CemuCrypto::Decrypt(char* TMD, char* TIK, QString basedir)
+qint32 CemuCrypto::Decrypt(char* TMD, const char* TIK, const QString& basedir)
 {
     qInfo() << "Original CDecrypt v2.0b written by crediar";
 
@@ -285,7 +304,7 @@ qint32 CemuCrypto::Decrypt(char* TMD, char* TIK, QString basedir)
         return EXIT_FAILURE;
     }
 
-    FEntry* fe = reinterpret_cast<FEntry*>(CNT + 0x20 + bs32(fst->EntryCount) * 0x20);
+    auto* fe = reinterpret_cast<FEntry*>(CNT + 0x20 + bs32(fst->EntryCount) * 0x20);
 
     quint32 Entries = bs32(*reinterpret_cast<quint32*>(CNT + 0x20 + bs32(fst->EntryCount) * 0x20 + 8));
     quint32 NameOff = 0x20 + bs32(fst->EntryCount) * 0x20 + Entries * 0x10;

@@ -6,9 +6,6 @@ class CEMUCRYPTOSHARED_EXPORT CemuCrypto : public QObject
 {
 #pragma pack(push, 1)
 
-//#define bs16(s) static_cast<quint16>( ((s)>>8) | ((s)<<8) )
-//#define bs32(s) static_cast<quint32>( (((s)&0xFF0000)>>8) | (((s)&0xFF00)<<8) | ((s)>>24) | ((s)<<24) )
-
     Q_OBJECT
 public:
     CemuCrypto();
@@ -32,20 +29,20 @@ signals:
     void Progress(int min, int max);
 
 private:
-    AES_KEY _key;
-    quint8 enc_title_key[16];
-    quint8 dec_title_key[16];
-    quint8 title_id[16];
+    AES_KEY _key{};
+    quint8 enc_title_key[16]{};
+    quint8 dec_title_key[16]{};
+    quint8 title_id[16]{};
 
     qulonglong H0Count = 0;
     qulonglong H0Fail = 0;
 
-    char* ReadFile(QString file, quint32* len);
-    void ExtractFileHash(QFile* in, qulonglong PartDataOffset, qulonglong FileOffset, qulonglong Size, QString FileName, quint16 ContentID, int i1, int i2);
-    void ExtractFile(QFile* in, qulonglong PartDataOffset, qulonglong FileOffset, qulonglong Size, QString FileName, quint16 ContentID, int i1, int i2);
+    char* ReadFile(const QString& file, quint32* len);
+    void ExtractFileHash(QFile* in, qulonglong PartDataOffset, qulonglong FileOffset, qulonglong Size, const QString& FileName, quint16 ContentID, int i1, int i2);
+    void ExtractFile(QFile* in, qulonglong PartDataOffset, qulonglong FileOffset, qulonglong Size, const QString& FileName, quint16 ContentID, int i1, int i2);
 
     qint32 Decrypt();
-    qint32 Decrypt(char* qtmd, char* qcetk, QString basedir);
+    qint32 Decrypt(char* qtmd, const char* qcetk, const QString& basedir);
 
     unsigned char WiiUCommenDevKey[16] = { 0x2F, 0x5C, 0x1B, 0x29, 0x44, 0xE7, 0xFD, 0x6F, 0xC3, 0x97, 0x96, 0x4B, 0x05, 0x76, 0x91, 0xFA };
     unsigned char WiiUCommenKey[16] = { 0xD7, 0xB0, 0x04, 0x02, 0x65, 0x9B, 0xA2, 0xAB, 0xD2, 0xCB, 0x0D, 0xB2, 0x7F, 0xA2, 0xB6, 0x56 };
@@ -58,23 +55,23 @@ public:
         CONTENT_OPTIONAL = (1 << 14),
     };
 
-    typedef struct
+    struct ContentInfo
     {
         quint16 IndexOffset;    //      0        0x204
         quint16 CommandCount;   //      2        0x206
         quint8  SHA2[32];                       //  12 0x208
-    } ContentInfo;
+    };
 
-    typedef struct
+    struct Content
     {
         quint32 ID;                                     //      0        0xB04
         quint16 Index;                  //      4  0xB08
         quint16 Type;                           //      6        0xB0A
         qulonglong Size;                                //      8        0xB0C
         quint8  SHA2[32];               //  16 0xB14
-    } Content;
+    } ;
 
-    typedef struct
+    struct TitleMetaData
     {
         quint32 SignatureType;          // 0x000
         quint8  Signature[0x100];       // 0x004
@@ -103,7 +100,7 @@ public:
 
         Content Contents[1024];         // 0x1E4
 
-    } TitleMetaData;
+    } ;
 
     struct FSTInfo
     {

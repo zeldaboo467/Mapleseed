@@ -4,7 +4,7 @@ QtCompressor::QtCompressor(QObject *parent) : QObject(parent)
 {
 }
 
-bool QtCompressor::compress(QString sourceFolder, QString destinationFile)
+bool QtCompressor::compress(const QString& sourceFolder, const QString& destinationFile)
 {
     QDir src(sourceFolder);
     if(!src.exists())
@@ -36,7 +36,7 @@ bool QtCompressor::compress(QString sourceFolder, QString destinationFile)
     return success;
 }
 
-bool QtCompressor::handleCompress(QString sourceFolder, QString prefex)
+bool QtCompressor::handleCompress(const QString& sourceFolder, const QString& prefex)
 {
 	QDir dir(sourceFolder);
 	if (!dir.exists())
@@ -45,9 +45,9 @@ bool QtCompressor::handleCompress(QString sourceFolder, QString prefex)
 	dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
 	QFileInfoList foldersList = dir.entryInfoList();
 
-	for (int i = 0; i < foldersList.length(); i++)
+    for (const auto & it : foldersList)
 	{
-		QString folderName = foldersList.at(i).fileName();
+        QString folderName = it.fileName();
 		QString folderPath = dir.absolutePath() + "/" + folderName;
 		QString newPrefex = prefex + "/" + folderName;
 
@@ -57,16 +57,16 @@ bool QtCompressor::handleCompress(QString sourceFolder, QString prefex)
 	dir.setFilter(QDir::NoDotAndDotDot | QDir::Files);
 	QFileInfoList filesList = dir.entryInfoList();
 
-	for (int i = 0; i < filesList.length(); i++)
+    for (const auto & it : filesList)
 	{
-		QFile file(dir.absolutePath() + "/" + filesList.at(i).fileName());
+        QFile file(dir.absolutePath() + "/" + it.fileName());
         if (!file.open(QIODevice::ReadOnly))
 		{
             qCritical() << "couldn't open file" << file;
 			return false;
 		}
 
-        QString filename(prefex + "/" + filesList.at(i).fileName());
+        QString filename(prefex + "/" + it.fileName());
         qInfo() << "Compressing" << file.fileName() << "<<" << filename;
 
 		dataStream << --countDown;
@@ -81,7 +81,7 @@ bool QtCompressor::handleCompress(QString sourceFolder, QString prefex)
 	return true;
 }
 
-bool QtCompressor::decompress(QString sourceFile, QString destinationFolder)
+bool QtCompressor::decompress(const QString& sourceFile, const QString& destinationFolder)
 {
 	//validation
 	QFile src(sourceFile);
@@ -143,7 +143,7 @@ bool QtCompressor::decompress(QString sourceFile, QString destinationFolder)
 	return true;
 }
 
-int QtCompressor::count(QString directory)
+int QtCompressor::count(const QString& directory)
 {
 	QDir dir(directory);
 	if (!dir.exists())
@@ -154,9 +154,9 @@ int QtCompressor::count(QString directory)
 	dir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
 	QFileInfoList foldersList = dir.entryInfoList();
 
-	for (int i = 0; i < foldersList.length(); i++)
+    for (const auto & it : foldersList)
 	{
-		QString folderName = foldersList.at(i).fileName();
+        QString folderName = it.fileName();
 		QString folderPath = dir.absolutePath() + "/" + folderName;
 
 		num += count(folderPath);
