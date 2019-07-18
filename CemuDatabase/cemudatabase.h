@@ -26,7 +26,9 @@ public:
 
     static QByteArray CreateTicket(QString id, QString key, QString ver, QString dir);
 
-    static qint64 DownloadFile(QUrl url, QString path);
+    static void DownloadFile(QUrl url, QString path);
+
+    static bool isHttpRedirect(QNetworkReply *reply);
 
     static CemuDatabase *instance;
 

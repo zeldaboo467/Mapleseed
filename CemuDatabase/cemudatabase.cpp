@@ -146,15 +146,13 @@ char *CemuDatabase::DownloadTMD(QString id, QString ver, QString dir)
     return data;
 }
 
-qint64 CemuDatabase::DownloadFile(QUrl url, QString path)
+void CemuDatabase::DownloadFile(QUrl url, QString path)
 {
-    qint64 filesize = 0;
-
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly))
     {
         qCritical() << file.errorString();
-        return filesize;
+        return;
     }
 
     QNetworkAccessManager manager;
@@ -164,12 +162,24 @@ qint64 CemuDatabase::DownloadFile(QUrl url, QString path)
     QNetworkReply *reply = manager.get(request);
     connect(reply, &QNetworkReply::readyRead, [&]{ file.write(reply->readAll()); });
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    connect(reply, &QNetworkReply::finished, [&]
+    {
+        if (isHttpRedirect(reply))
+        {
+            file.close();
+            auto qVariantUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+            DownloadFile(qVariantUrl.toUrl(), path);
+        }
+    });
     loop.exec();
 
-    filesize = file.size();
-    file.close();
     delete reply;
-    return filesize;
+}
+
+bool CemuDatabase::isHttpRedirect(QNetworkReply *reply)
+{
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    return statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 || statusCode == 307 || statusCode == 308;
 }
 
 QByteArray CemuDatabase::CreateTicket(QString id, QString key, QString ver, QString dir)
