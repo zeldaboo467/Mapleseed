@@ -19,6 +19,8 @@ public:
 
     bool DownloadSingle(QUrl url, QString filepath, QueueInfo *info);
 
+    static bool isHttpRedirect(QNetworkReply *reply);
+
     static DownloadQueue *instance;
 
 signals:

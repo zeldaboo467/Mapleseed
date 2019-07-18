@@ -84,10 +84,24 @@ bool DownloadQueue::DownloadSingle(QUrl url, QString filepath, QueueInfo *info)
     connect(info->reply, &QNetworkReply::downloadProgress, this, &DownloadQueue::progress);
     connect(info->reply, &QNetworkReply::readyRead, info, &QueueInfo::readyRead);
     connect(info->reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    connect(info->reply, &QNetworkReply::finished, [&]
+    {
+        if (isHttpRedirect(info->reply))
+        {
+            auto qVariant = info->reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+            DownloadSingle(qVariant.toUrl(), filepath, info);
+        }
+    });
     loop.exec();
 
     file->close();
     return true;
+}
+
+bool DownloadQueue::isHttpRedirect(QNetworkReply *reply)
+{
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    return statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 || statusCode == 307 || statusCode == 308;
 }
 
 void DownloadQueue::progress(qint64 received, qint64 total)
