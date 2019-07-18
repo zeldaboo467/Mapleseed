@@ -14,6 +14,7 @@
 #include <QNetworkReply>
 
 #include "../Core/titleinfo.h"
+#include "../Core/settings.h"
 
 #if defined(CEMUDB_LIBRARY)
 #  define CEMUDBSHARED_EXPORT Q_DECL_EXPORT

@@ -8,7 +8,8 @@ CemuLibrary *CemuLibrary::initialize()
 {
     qInfo() << "Cemu Library v1.0.0 loaded";
 
-    if (!instance) {
+    if (!instance)
+    {
         instance = new CemuLibrary;
     }
 
@@ -27,8 +28,10 @@ void CemuLibrary::init(QString directory)
     }
 
     library.clear();
-    if (!directory.isEmpty()) {
-        if (QDir(directory).exists()) {
+    if (!directory.isEmpty())
+    {
+        if (QDir(directory).exists())
+        {
             directory = QDir(directory).absolutePath();
         }
         else {
@@ -53,14 +56,16 @@ TitleInfo *CemuLibrary::find(QString id)
 QString CemuLibrary::XmlValue(const QFileInfo &metaxml, const QString &field)
 {
     QString value;
-    if (QFile(metaxml.filePath()).exists()) {
+    if (QFile(metaxml.filePath()).exists())
+    {
         QDomDocument doc;
         QFile file(metaxml.filePath());
         if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file))
             return nullptr;
 
         QDomNodeList rates = doc.elementsByTagName("menu");
-        for (int i = 0; i < rates.size(); i++) {
+        for (int i = 0; i < rates.size(); i++)
+        {
             QDomNode n = rates.item(i);
             QDomElement element = n.firstChildElement(field);
             if (element.isNull())
@@ -74,7 +79,8 @@ QString CemuLibrary::XmlValue(const QFileInfo &metaxml, const QString &field)
 QVariant CemuLibrary::processItem(const QString &d)
 {
     auto self = CemuLibrary::instance;
-    if (!self) {
+    if (!self)
+    {
         return NULL;
     }
     QString directory(Settings::value("cemu/library").toString());

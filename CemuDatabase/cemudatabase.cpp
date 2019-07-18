@@ -1,5 +1,4 @@
 #include "cemudatabase.h"
-#include "../Core/settings.h"
 
 CemuDatabase *CemuDatabase::instance;
 
@@ -35,13 +34,15 @@ void CemuDatabase::init(QString jsonpath)
     }
 
     QFile qfile(jsonpath);
-    if (!qfile.open(QIODevice::ReadOnly)) {
+    if (!qfile.exists() || !qfile.open(QIODevice::ReadOnly))
+    {
         qCritical() << qfile.errorString();
         return;
     }
 
     QJsonDocument doc = QJsonDocument::fromJson(qfile.readAll());
-    if (doc["titlekeys"].isArray()) {
+    if (doc["titlekeys"].isArray())
+    {
         QJsonArray array = doc["titlekeys"].toArray();
         for(auto item : array.toVariantList())
         {
@@ -67,14 +68,16 @@ TitleInfo *CemuDatabase::Create(QString xmlpath)
 QString CemuDatabase::XmlValue(const QFileInfo &metaxml, const QString &field)
 {
     QString value;
-    if (QFile(metaxml.filePath()).exists()) {
+    if (QFile(metaxml.filePath()).exists())
+    {
         QDomDocument doc;
         QFile file(metaxml.filePath());
         if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file))
             return nullptr;
 
         QDomNodeList rates = doc.elementsByTagName("menu");
-        for (int i = 0; i < rates.size(); i++) {
+        for (int i = 0; i < rates.size(); i++)
+        {
             QDomNode n = rates.item(i);
             QDomElement element = n.firstChildElement(field);
             if (element.isNull())
@@ -97,7 +100,8 @@ TitleInfo *CemuDatabase::find(QString id)
 bool CemuDatabase::ValidId(QString id)
 {
     auto& db = CemuDatabase::instance->database;
-    if (db.contains(id.toUpper())) {
+    if (db.contains(id.toUpper()))
+    {
         return true;
     }
     return false;
@@ -123,12 +127,14 @@ char *CemuDatabase::DownloadTMD(QString id, QString ver, QString dir)
     }
 
     QByteArray buffer;
-    if (!QFile(tmdpath).exists()) {
+    if (!QFile(tmdpath).exists())
+    {
         DownloadFile(tmdurl, tmdpath);
     }
 
     QFile* tmdfile = new QFile(tmdpath);
-    if (!tmdfile->open(QIODevice::ReadWrite)) {
+    if (!tmdfile->open(QIODevice::ReadWrite))
+    {
         qCritical() << tmdfile->errorString();
         return nullptr;
     }
@@ -145,7 +151,8 @@ qint64 CemuDatabase::DownloadFile(QUrl url, QString path)
     qint64 filesize = 0;
 
     QFile file(path);
-    if (!file.open(QIODevice::WriteOnly)) {
+    if (!file.open(QIODevice::WriteOnly))
+    {
         qCritical() << file.errorString();
         return filesize;
     }

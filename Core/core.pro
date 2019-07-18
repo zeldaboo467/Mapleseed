@@ -47,6 +47,8 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+unix|win32: LIBS += -LC:/OpenSSL-v111-Win64/lib/ -llibcrypto
+
 INCLUDEPATH += C:/OpenSSL-v111-Win64/include
 DEPENDPATH += C:/OpenSSL-v111-Win64/include
 

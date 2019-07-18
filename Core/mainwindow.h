@@ -40,11 +40,11 @@ private slots:
 
       void on_showContextMenu(QListWidget* listWidget, const QPoint& pos);
 
-      void on_CemuDb_LoadComplete();
+      void CemuDbLoadComplete();
 
-      void on_newDatabase_entry(TitleInfo*info);
+      void NewDatabaseEntry(TitleInfo*info);
 
-      void on_newLibrary_entry(QString xmlfile);
+      void NewLibraryEntry(QString xmlfile);
 
       void on_actionExit_triggered();
 

@@ -43,9 +43,9 @@ void MainWindow::initialize()
 void MainWindow::initConnections()
 {
     qDebug() << "initializing event connections";
-    connect(CemuDatabase::instance, &CemuDatabase::OnNewEntry, this, &MainWindow::on_newDatabase_entry);
-    connect(CemuDatabase::instance, &CemuDatabase::OnLoadComplete, this, &MainWindow::on_CemuDb_LoadComplete);
-    connect(CemuLibrary::instance, &CemuLibrary::OnNewEntry, this, &MainWindow::on_newLibrary_entry);
+    connect(CemuDatabase::instance, &CemuDatabase::OnLoadComplete, this, &MainWindow::CemuDbLoadComplete);
+    connect(CemuDatabase::instance, &CemuDatabase::OnNewEntry, this, &MainWindow::NewDatabaseEntry);
+    connect(CemuLibrary::instance, &CemuLibrary::OnNewEntry, this, &MainWindow::NewLibraryEntry);
     connect(DownloadQueue::instance, &DownloadQueue::OnEnqueue, this, &MainWindow::downloadQueueAdd);
     connect(DownloadQueue::instance, &DownloadQueue::DownloadProgress, this, &MainWindow::updateDownloadProgress);
 }
@@ -231,12 +231,12 @@ void MainWindow::on_showContextMenu(QListWidget *listWidget, const QPoint &pos)
     menu.exec(globalPos);
 }
 
-void MainWindow::on_CemuDb_LoadComplete()
+void MainWindow::CemuDbLoadComplete()
 {
     Helper::filter("USA", "", ui->databaseListWidget);
 }
 
-void MainWindow::on_newDatabase_entry(TitleInfo *info)
+void MainWindow::NewDatabaseEntry(TitleInfo *info)
 {
     if (info->titleType() != TitleType::Game) return;
 
@@ -246,7 +246,7 @@ void MainWindow::on_newDatabase_entry(TitleInfo *info)
     ui->databaseListWidget->addItem(item);
 }
 
-void MainWindow::on_newLibrary_entry(QString xmlfile)
+void MainWindow::NewLibraryEntry(QString xmlfile)
 {
     auto info = CemuDatabase::Create(xmlfile);
 
