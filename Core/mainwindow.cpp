@@ -18,31 +18,36 @@ MainWindow::~MainWindow()
 void MainWindow::initialize()
 {
     setWindowTitle("MapleSeed++ v1.1.0");
+    Settings settings;
 
     connect(Logging::instance, &Logging::OnLogEvent, this, &MainWindow::logEvent);
 
     ui->actionDebug->setChecked(Settings::value("debug").toBool());
     ui->actionCemuIntegrate->setChecked(Settings::value("cemu/enabled").toBool());
     ui->actionCemuFullscreen->setChecked(Settings::value("cemu/fullscreen").toBool());
+    ui->actionGamepad->setChecked(Settings::value("Gamepad/enabled").toBool());
 
-    if (Settings::value("cemu/coversDir").toString().isEmpty()) {
+    if (Settings::value("cemu/coversDir").toString().isEmpty())
+    {
         Settings::setValue("cemu/coversDir", QDir(Settings::getdirpath()).filePath("covers"));
     }
 
-    Settings settings;
-    CemuDatabase::instance = new CemuDatabase;
-    CemuLibrary::instance = new CemuLibrary;
-    DownloadQueue::instance = new DownloadQueue;
-
-    initConnections();
+    Gamepad::initialize();
+    setupConnections();
     CemuDatabase::initialize();
     CemuLibrary::initialize();
     DownloadQueue::initialize();
 }
 
-void MainWindow::initConnections()
+void MainWindow::setupConnections()
 {
     qDebug() << "initializing event connections";
+    connect(Gamepad::instance, &Gamepad::gameUp, this, &MainWindow::gameUp, Qt::ConnectionType::UniqueConnection);
+    connect(Gamepad::instance, &Gamepad::gameDown, this, &MainWindow::gameDown, Qt::ConnectionType::UniqueConnection);
+    connect(Gamepad::instance, &Gamepad::gameStart, this, &MainWindow::gameStart, Qt::ConnectionType::UniqueConnection);
+    connect(Gamepad::instance, &Gamepad::gameClose, this, &MainWindow::gameClose, Qt::ConnectionType::UniqueConnection);
+    connect(Gamepad::instance, &Gamepad::prevTab, this, &MainWindow::prevTab, Qt::ConnectionType::UniqueConnection);
+    connect(Gamepad::instance, &Gamepad::nextTab, this, &MainWindow::nextTab, Qt::ConnectionType::UniqueConnection);
     connect(CemuDatabase::instance, &CemuDatabase::OnLoadComplete, this, &MainWindow::CemuDbLoadComplete);
     connect(CemuDatabase::instance, &CemuDatabase::OnNewEntry, this, &MainWindow::NewDatabaseEntry);
     connect(CemuLibrary::instance, &CemuLibrary::OnNewEntry, this, &MainWindow::NewLibraryEntry);
@@ -79,6 +84,33 @@ void MainWindow::downloadCemuId(QString id, QString ver)
         connect(crypto, &CemuCrypto::Progress, qinfo, &QueueInfo::updateProgress);
         watcher->setFuture(QtConcurrent::run(crypto, &CemuCrypto::Start));
     });
+}
+
+void MainWindow::executeCemu(QString rpxPath)
+{
+    QFileInfo rpx(rpxPath);
+    if (rpx.exists())
+    {
+        QString args("-g \"" + rpx.filePath() + "\"");
+        if (Settings::value("cemu/fullscreen").toBool())
+        {
+            args.append(" -f");
+        }
+        QString file(Settings::value("cemu/path").toString());
+        process->setWorkingDirectory(QFileInfo(file).dir().path());
+        process->setNativeArguments(args);
+        process->setProgram(file);
+        process->start();
+    }
+}
+
+bool MainWindow::processActive()
+{
+    if (process->state() == process->NotRunning)
+    {
+        return false;
+    }
+    return true;
 }
 
 void MainWindow::logEvent(QString msg)
@@ -396,4 +428,128 @@ void MainWindow::on_actionCemuDecrypt_triggered()
         connect(&crypto, &CemuCrypto::Progress, this, &MainWindow::updateCemuCryptoProgress);
         crypto.Start();
     });
+}
+
+void MainWindow::gameUp(bool pressed)
+{
+    if (!pressed || processActive()) return;
+    qDebug() << "row up";
+
+    QListWidget *listWidget;
+    if (ui->tabWidget->currentIndex() == 0)
+    {
+        listWidget = ui->libraryListWidget;
+    }
+    else if (ui->tabWidget->currentIndex() == 1)
+    {
+        listWidget = ui->databaseListWidget;
+    }
+    else
+    {
+        return;
+    }
+
+    auto row = listWidget->currentRow();
+    if (listWidget->currentRow() == 0)
+    {
+        row = listWidget->count()-1;
+    }
+    else
+    {
+        row -= 1;
+        auto item(listWidget->item(row));
+        while (item && item->isHidden())
+        {
+            item = listWidget->item(row -= 1);
+        }
+    }
+    listWidget->setCurrentRow(row);
+}
+
+void MainWindow::gameDown(bool pressed)
+{
+    if (!pressed || processActive()) return;
+    qDebug() << "row down";
+
+    QListWidget *listWidget;
+    if (ui->tabWidget->currentIndex() == 0)
+    {
+        listWidget = ui->libraryListWidget;
+    }
+    else if (ui->tabWidget->currentIndex() == 1)
+    {
+        listWidget = ui->databaseListWidget;
+    }
+    else
+    {
+        return;
+    }
+
+    auto row = listWidget->currentRow();
+    if (listWidget->currentRow() == listWidget->count()-1)
+    {
+        row = 0;
+    }
+    else
+    {
+        row += 1;
+        auto item(listWidget->item(row));
+        while (item && item->isHidden())
+        {
+            item = listWidget->item(row += 1);
+        }
+    }
+    listWidget->setCurrentRow(row);
+}
+
+void MainWindow::gameStart(bool pressed)
+{
+    if (!pressed || processActive()) return;
+    qDebug() << "game start";
+
+    auto item = ui->libraryListWidget->selectedItems().first();
+    auto id(item->data(Qt::UserRole).toString());
+    auto info = Helper::findWiiUTitleInfo(id);
+
+    if (info)
+    {
+        executeCemu(info->Rpx());
+    }
+}
+
+void MainWindow::gameClose(bool pressed)
+{
+    if (!pressed || !processActive()) return;
+
+    process->terminate();
+}
+
+void MainWindow::prevTab(bool pressed)
+{
+    if (!pressed || processActive()) return;
+    qDebug() << "prev tab";
+
+    int index = ui->tabWidget->currentIndex();
+    ui->tabWidget->setCurrentIndex(index-1);
+}
+
+void MainWindow::nextTab(bool pressed)
+{
+    if (!pressed || processActive()) return;
+    qDebug() << "next tab";
+
+    int index = ui->tabWidget->currentIndex();
+    ui->tabWidget->setCurrentIndex(index+1);
+}
+
+void MainWindow::on_actionGamepad_triggered(bool checked)
+{
+    Settings::setValue("Gamepad/enabled", checked);
+    if (checked)
+    {
+        Gamepad::enable();
+    }else
+    {
+        Gamepad::disable();
+    }
 }

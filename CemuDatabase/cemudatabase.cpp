@@ -1,6 +1,6 @@
 #include "cemudatabase.h"
 
-CemuDatabase *CemuDatabase::instance;
+CemuDatabase *CemuDatabase::instance = new CemuDatabase;
 
 CemuDatabase::CemuDatabase() = default;
 
@@ -8,7 +8,8 @@ CemuDatabase* CemuDatabase::initialize()
 {
     qInfo() << "Database library v1.0.0 loaded";
 
-    if (!instance) {
+    if (!instance)
+    {
         instance = new CemuDatabase;
     }
 

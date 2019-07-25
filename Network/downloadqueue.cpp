@@ -1,6 +1,6 @@
 #include "downloadqueue.h"
 
-DownloadQueue *DownloadQueue::instance;
+DownloadQueue *DownloadQueue::instance = new DownloadQueue;
 
 DownloadQueue::DownloadQueue() = default;
 
@@ -8,7 +8,8 @@ DownloadQueue *DownloadQueue::initialize()
 {
     qInfo() << "Network Library v1.0.0 loaded";
 
-    if (!instance) {
+    if (!instance)
+    {
         instance = new DownloadQueue;
     }
 

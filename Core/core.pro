@@ -27,12 +27,14 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 CONFIG += c++11
 
 SOURCES += \
+        gamepad.cpp \
         helper.cpp \
         logging.cpp \
         main.cpp \
         mainwindow.cpp
 
 HEADERS += \
+        gamepad.h \
         helper.h \
         logging.h \
         mainwindow.h \

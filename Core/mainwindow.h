@@ -7,6 +7,7 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QListWidget>
+#include "gamepad.h"
 #include "cemudatabase.h"
 #include "cemulibrary.h"
 #include "queueinfo.h"
@@ -25,9 +26,13 @@ public:
 
     void initialize();
 
-    void initConnections();
+    void setupConnections();
 
     void downloadCemuId(QString id, QString ver);
+
+    void executeCemu(QString rpxPath);
+
+    bool processActive();
 
 private slots:
       void logEvent(QString msg);
@@ -76,9 +81,24 @@ private slots:
 
       void on_actionCemuDecrypt_triggered();
 
+      void gameUp(bool pressed);
+
+      void gameDown(bool pressed);
+
+      void gameStart(bool pressed);
+
+      void gameClose(bool pressed);
+
+      void prevTab(bool pressed);
+
+      void nextTab(bool pressed);
+
+      void on_actionGamepad_triggered(bool checked);
+
 private:
     Ui::MainWindow *ui;
     QMutex mutex;
+    QProcess* process = new QProcess;
 };
 
 #endif // MAINWINDOW_H

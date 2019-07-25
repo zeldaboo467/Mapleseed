@@ -1,6 +1,6 @@
 #include "cemulibrary.h"
 
-CemuLibrary *CemuLibrary::instance;
+CemuLibrary *CemuLibrary::instance = new CemuLibrary;
 
 CemuLibrary::CemuLibrary() = default;
 

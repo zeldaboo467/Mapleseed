@@ -13,7 +13,7 @@ public:
     {
         qInfo() << "initializing settings";
         QCoreApplication::setOrganizationName("Maple-Tree");
-        QCoreApplication::setOrganizationDomain("tsumes.com");
+        QCoreApplication::setOrganizationDomain("mapleseed.pixxy.in");
         QCoreApplication::setApplicationName("MapleSeed++");
     }
     ~Settings()
