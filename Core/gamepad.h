@@ -12,8 +12,7 @@ class Gamepad : public QObject
 {
     Q_OBJECT
 public:
-    explicit Gamepad(QObject *parent = nullptr);
-    ~Gamepad();
+    explicit Gamepad();
 
     static Gamepad *initialize();
 

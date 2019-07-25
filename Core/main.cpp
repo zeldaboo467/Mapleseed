@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-    Logging logging;
+    Logging::initialize();
     qInstallMessageHandler(Logging::messageOutput);
     QLoggingCategory::installFilter(Logging::categoryFilter);
     QApplication a(argc, argv);

@@ -1,17 +1,10 @@
 #include "gamepad.h"
 #include "settings.h"
 
-Gamepad *Gamepad::instance;
+Gamepad *Gamepad::instance = new Gamepad;
 bool Gamepad::isEnabled = false;
 
-Gamepad::Gamepad(QObject *parent) : QObject(parent)
-{
-}
-
-Gamepad::~Gamepad()
-{
-    qInfo() << "Gamepad handler terminated";
-}
+Gamepad::Gamepad() = default;
 
 Gamepad *Gamepad::initialize()
 {

@@ -32,8 +32,8 @@ void MainWindow::initialize()
         Settings::setValue("cemu/coversDir", QDir(Settings::getdirpath()).filePath("covers"));
     }
 
-    Gamepad::initialize();
     setupConnections();
+    Gamepad::initialize();
     CemuDatabase::initialize();
     CemuLibrary::initialize();
     DownloadQueue::initialize();
@@ -115,7 +115,7 @@ bool MainWindow::processActive()
 
 void MainWindow::logEvent(QString msg)
 {
-    if (mutex.tryLock(100))
+    if (mutex.tryLock(1000))
     {
         if (ui && ui->statusbar)
         {
@@ -433,7 +433,6 @@ void MainWindow::on_actionCemuDecrypt_triggered()
 void MainWindow::gameUp(bool pressed)
 {
     if (!pressed || processActive()) return;
-    qDebug() << "row up";
 
     QListWidget *listWidget;
     if (ui->tabWidget->currentIndex() == 0)
@@ -469,7 +468,6 @@ void MainWindow::gameUp(bool pressed)
 void MainWindow::gameDown(bool pressed)
 {
     if (!pressed || processActive()) return;
-    qDebug() << "row down";
 
     QListWidget *listWidget;
     if (ui->tabWidget->currentIndex() == 0)
@@ -520,6 +518,7 @@ void MainWindow::gameStart(bool pressed)
 void MainWindow::gameClose(bool pressed)
 {
     if (!pressed || !processActive()) return;
+    qDebug() << "game close";
 
     process->terminate();
 }

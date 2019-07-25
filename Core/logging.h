@@ -13,12 +13,18 @@ class Logging : public QObject
     Q_OBJECT
 public:
     explicit Logging(QObject *parent = nullptr);
+    ~Logging();
+
+    static Logging *initialize();
 
     static void categoryFilter(QLoggingCategory *category);
 
     static void messageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
     static Logging *instance;
+
+private:
+    QFile *file;
 
 signals:
     void OnLogEvent(QString msg);

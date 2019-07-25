@@ -6,7 +6,30 @@ Logging *Logging::instance;
 Logging::Logging(QObject *parent) : QObject(parent)
 {
     connect(this, &Logging::OnLogEvent, this, &Logging::logEvent);
-    Logging::instance = this;
+}
+
+Logging::~Logging()
+{
+    file->close();
+    delete file;
+}
+
+Logging *Logging::initialize()
+{
+    if (!instance)
+    {
+        instance = new Logging;
+    }
+
+    instance->file = new QFile("mapleseed.log");
+    if (!instance->file->open(QIODevice::Append))
+    {
+      qWarning("Couldn't open file.");
+      return nullptr;
+    }
+
+    qDebug() << "Logging handler initialized";
+    return instance;
 }
 
 void Logging::categoryFilter(QLoggingCategory *category)
@@ -65,14 +88,11 @@ void Logging::logEvent(QString msg)
 {
     if (Settings::value("debug").toBool())
     {
-        QFile file("mapleseed.log");
-        if (!file.open(QIODevice::Append))
-        {
-          qWarning("Couldn't open file.");
-          return;
-        }
         QString log(QDateTime::currentDateTime().toString("[MMM dd, yyyy HH:mm:ss ap] ") + msg + "\n");
-        file.write(log.toLatin1());
-        file.close();
+        file->write(log.toLatin1());
+        if (!file->flush())
+        {
+            qWarning("Unable to write log to file");
+        }
     }
 }
